@@ -8,8 +8,8 @@
 //Returns a single value of type double
 double random_double(double m, double n)
 {
-    std::random_device rd; //seed for the random number engine
-    std::mt19937 gen(rd()); //Standard mersenne_twister_engine seeded with rd()
+    static thread_local std::random_device rd; //seed for the random number engine
+    static thread_local std::mt19937 gen(rd()); //Standard mersenne_twister_engine seeded with rd()
     std::uniform_real_distribution<> dis(m, n); // Generate random numbers between -1 and 1
     return dis(gen);
 }
