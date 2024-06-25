@@ -7,13 +7,13 @@ CXXFLAGS = -std=c++20 -fopenmp -Wall -Wextra -O2
 MPICXXFLAGS = -std=c++17 -fopenmp -Wall -Wextra -O2
 
 # Source files
-SOURCES = omp-pi.cpp serial-pi.cpp mpi-pi.cpp
+SOURCES = omp-pi.cpp serial-pi.cpp mpi-pi.cpp MPI+OMP-hybrid.cpp
 
 # Object files
 OBJECTS = $(SOURCES:.cpp=.o)
 
 # Executables
-EXECUTABLES = omp-pi serial-pi mpi-pi
+EXECUTABLES = omp-pi serial-pi mpi-pi MPI+OMP-hybrid
 
 # Default target
 all: $(EXECUTABLES)
@@ -28,6 +28,9 @@ omp-pi: omp-pi.o
 serial-pi: serial-pi.o
 	$(CXX) $(CXXFLAGS) -o $@ $<
 
+MPI+OMP-hybrid: MPI+OMP-hybrid.o
+	$(MPICXX) $(MPICXXFLAGS) -o $@ $<
+
 # Rule for compiling
 mpi-pi.o: mpi-pi.cpp
 	$(MPICXX) $(MPICXXFLAGS) -c $<
@@ -37,6 +40,9 @@ omp-pi.o: omp-pi.cpp
 
 serial-pi.o: serial-pi.cpp
 	$(CXX) $(CXXFLAGS) -c $<
+
+MPI+OMP-hybrid.o: MPI+OMP-hybrid.cpp
+	$(MPICXX) $(MPICXXFLAGS) -c $<
 
 # Clean up
 clean:

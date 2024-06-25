@@ -17,9 +17,15 @@ double random_double(double m, double n)
 int main() {
     int niter = 1000000; 
     int count = 0;
-
+    omp_set_num_threads(4);
+    
     #pragma omp parallel
     {
+        #pragma omp single
+        {
+            std::cout << "Number of OMP threads = " << omp_get_num_threads() << std::endl;
+        }
+        
         int local_count = 0;
 
         #pragma omp for nowait
