@@ -1,5 +1,6 @@
 #include <iostream>
 #include <random>
+#include <ranges>
 
 //Function to generate random numbers between m and n
 //Returns a single value of type double
@@ -13,20 +14,21 @@ auto random_double(double m, double n)
 
 int main()
 {
-    double x,y,z,Pi;
-    double niter = 1e4;
-    int count=0;
-    for(int i=0; i < niter; ++i)
-    {
-        x = random_double(-1.0,1.0);
-        y = random_double(-1.0,1.0);
-        z = std::sqrt(x*x+y*y);
-        if(z <= 1)
-        {
-            ++count;
-        }
-    }
-    Pi = 4*(count/niter);
+    int niter = 1e5;
+
+    //Use a lambda expression combined with count_if function to count number of points inside a unit circle
+    auto count = std::count_if(std::views::iota(1, niter + 1).begin(), std::views::iota(1, niter + 1).end(),[](auto) {
+        double x = random_double(-1.0, 1.0);
+        double y = random_double(-1.0, 1.0);
+        double z = std::sqrt(x*x + y*y);
+        return z <= 1;
+    });
+
+    //Calculate value of Pi
+    auto Pi = 4*(count/static_cast<double>(niter));
+    
+    //Print the value
     std::cout << "Pi = " << Pi << std::endl;
+    
     return EXIT_SUCCESS;
 }
