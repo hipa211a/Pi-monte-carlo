@@ -19,6 +19,9 @@ serial-pi: serial-pi.cpp
 omp-pi: omp-pi.cpp
 	$(CXX) $(CXXFLAGS) -o omp-pi omp-pi.cpp
 
+pi-thread: pi-thread.cpp
+	$(CXX) $(CXXFLAGS) -o pi-thread pi-thread.cpp
+
 mpi-pi: mpi-pi.cpp
 	$(MPICXX) $(MPICXXFLAGS) -o mpi-pi mpi-pi.cpp
 
