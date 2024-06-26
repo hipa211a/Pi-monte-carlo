@@ -14,18 +14,17 @@ auto random_double(double m, double n)
 
 int main()
 {
-    int niter = 1e5;
+    int niter = 1e6;
 
     //Use a lambda expression combined with count_if function to count number of points inside a unit circle
     auto count = std::count_if(std::views::iota(1, niter + 1).begin(), std::views::iota(1, niter + 1).end(),[](auto) {
         double x = random_double(-1.0, 1.0);
         double y = random_double(-1.0, 1.0);
-        double z = std::sqrt(x*x + y*y);
-        return z <= 1;
+        return x*x + y*y <= 1;
     });
 
     //Calculate value of Pi
-    auto Pi = 4*(count/static_cast<double>(niter));
+    auto Pi = 4.0 * (count/static_cast<double>(niter));
     
     //Print the value
     std::cout << "Pi = " << Pi << std::endl;

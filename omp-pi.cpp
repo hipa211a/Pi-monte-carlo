@@ -32,8 +32,7 @@ int main() {
         for (int i = 0; i < niter; ++i) {
             double x = random_double(-1.0, 1.0);
             double y = random_double(-1.0, 1.0);
-            double z = std::sqrt(x*x + y*y);
-            if (z <= 1) {
+            if (x*x + y*y <= 1.0f) {
                 ++local_count;
             }
         }
@@ -43,7 +42,7 @@ int main() {
     }
 
     //Calculate value of Pi
-    auto Pi = 4*(count/static_cast<double>(niter));
+    auto Pi = 4.0 * (count/static_cast<double>(niter));
     
     //Print the value
     std::cout << "Pi = " << Pi << std::endl;

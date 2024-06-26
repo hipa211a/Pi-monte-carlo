@@ -31,8 +31,7 @@ int main(int argc, char** argv)
     for (int i = 0; i < local_niter; ++i) {
         double x = random_double(-1.0, 1.0, gen);
         double y = random_double(-1.0, 1.0, gen);
-        double z = std::sqrt(x*x + y*y);
-        if (z <= 1) {
+        if (x*x + y*y <= 1.0f) {
             ++local_count;
         }
     }
