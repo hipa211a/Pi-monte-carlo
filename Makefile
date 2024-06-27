@@ -1,35 +1,47 @@
-# Compiler
+# Compilers
 CXX = g++-11
 MPICXX = mpic++
+NVCC = nvcc
 
 # Compiler flags
 CXXFLAGS = -std=c++20 -fopenmp -O2
 MPICXXFLAGS = -std=c++17 -fopenmp -O2
+NVCCFLAGS = -std=c++14 -O2
 
-# Setting the source and binary files
-SRC = $(wildcard *.cpp)
-BIN = $(SRC:.cpp=)
+# Directories
+SRCDIR = src
+BINDIR = bin
 
-#Rules 
-default: serial-pi omp-pi mpi-pi MPI+OMP-hybrid
+# Explicit targets
+TARGETS = $(BINDIR)/serial-pi $(BINDIR)/omp-pi $(BINDIR)/mpi-pi $(BINDIR)/MPI+OMP-hybrid $(BINDIR)/cuda-pi
 
-serial-pi: serial-pi.cpp
-	$(CXX) $(CXXFLAGS) -o serial-pi serial-pi.cpp
+# Default target
+all: $(BINDIR) $(TARGETS)
 
-omp-pi: omp-pi.cpp
-	$(CXX) $(CXXFLAGS) -o omp-pi omp-pi.cpp
+# Create bin directory if it doesn't exist
+$(BINDIR):
+	mkdir -p $(BINDIR)
 
-pi-thread: pi-thread.cpp
-	$(CXX) $(CXXFLAGS) -o pi-thread pi-thread.cpp
+$(BINDIR)/serial-pi: $(SRCDIR)/serial-pi.cpp
+	$(CXX) $(CXXFLAGS) -o $(BINDIR)/serial-pi $(SRCDIR)/serial-pi.cpp
 
-mpi-pi: mpi-pi.cpp
-	$(MPICXX) $(MPICXXFLAGS) -o mpi-pi mpi-pi.cpp
+$(BINDIR)/omp-pi: $(SRCDIR)/omp-pi.cpp
+	$(CXX) $(CXXFLAGS) -o $(BINDIR)/omp-pi $(SRCDIR)/omp-pi.cpp
 
-MPI+OMP-hybrid: MPI+OMP-hybrid.cpp
-	$(MPICXX) $(MPICXXFLAGS) -o MPI+OMP-hybrid MPI+OMP-hybrid.cpp
+$(BINDIR)/pi-thread: $(SRCDIR)/pi-thread.cpp
+	$(CXX) $(CXXFLAGS) -o $(BINDIR)/pi-thread $(SRCDIR)/pi-thread.cpp
+
+$(BINDIR)/mpi-pi: $(SRCDIR)/mpi-pi.cpp
+	$(MPICXX) $(MPICXXFLAGS) -o $(BINDIR)/mpi-pi $(SRCDIR)/mpi-pi.cpp
+
+$(BINDIR)/MPI+OMP-hybrid: $(SRCDIR)/MPI+OMP-hybrid.cpp
+	$(MPICXX) $(MPICXXFLAGS) -o $(BINDIR)/MPI+OMP-hybrid $(SRCDIR)/MPI+OMP-hybrid.cpp
+
+$(BINDIR)/cuda-pi: $(SRCDIR)/cuda-pi.cu
+	$(NVCC) $(NVCCFLAGS) -o $(BINDIR)/cuda-pi $(SRCDIR)/cuda-pi.cu
 
 clean:
-	@$(RM) $(BIN)
+	rm -rf $(BINDIR)
 
 # Phony targets
-.PHONY: default clean
+.PHONY: all clean
