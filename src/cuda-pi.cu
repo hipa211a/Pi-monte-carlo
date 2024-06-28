@@ -1,5 +1,6 @@
 #include <iostream>
 #include <cmath>
+#include <chrono>
 #include <cuda_runtime.h>
 #include <curand_kernel.h>
 #include <memory>
@@ -44,9 +45,13 @@ CudaUniquePtr<T> make_cuda_unique(size_t size) {
     return CudaUniquePtr<T>(ptr);
 }
 
-int main() {
+int main() 
+{
     unsigned long long h_count = 0;
     constexpr unsigned long long iterations = 1000000;
+
+    //Start time measurement
+    const auto tstart{std::chrono::high_resolution_clock::now()};
 
     auto d_count = make_cuda_unique<unsigned long long>(sizeof(unsigned long long));
     auto d_states = make_cuda_unique<curandState>(BLOCKS * THREADS_PER_BLOCK * sizeof(curandState));
@@ -59,10 +64,17 @@ int main() {
 
     cudaMemcpy(&h_count, d_count.get(), sizeof(unsigned long long), cudaMemcpyDeviceToHost);
 
+    //End the time measurement
+    const auto tend{std::chrono::high_resolution_clock::now()};
+
     double pi_estimate = 4.0 * static_cast<double>(h_count) / static_cast<double>(iterations * BLOCKS * THREADS_PER_BLOCK);
 
     std::cout << "Estimated Pi: " << pi_estimate << std::endl;
     std::cout << "Difference from M_PI: " << std::abs(pi_estimate - M_PI) << std::endl;
+
+    //Duration
+    auto tduration = std::chrono::duration_cast<std::chrono::milliseconds>(tend-tstart).count();
+    std::cout << "Time taken = " << tduration << "ms" << std::endl;
 
     return 0;
 }

@@ -1,6 +1,7 @@
 #include <iostream>
 #include <random>
 #include <cmath>
+#include <chrono>
 #include <mpi.h>
 #include <omp.h>
 
@@ -13,13 +14,17 @@ double random_double(double m, double n, std::mt19937& gen)
 
 int main(int argc, char** argv) 
 {
+    //Start time measurement
+    const auto tstart{std::chrono::high_resolution_clock::now()};
+    
+    //Start MPI processes
     MPI_Init(&argc, &argv);
 
     int rank, size;
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     MPI_Comm_size(MPI_COMM_WORLD, &size);
 
-    long long int niter = 100000000; // Total number of iterations
+    long long int niter = 1000000; // Total number of iterations
     int local_niter = niter / size; // Iterations per process
     int local_rank_count = 0; //local count for a single process
     int global_count = 0;   //global count
@@ -72,8 +77,18 @@ int main(int argc, char** argv)
     if (rank == 0) {
         double Pi = 4.0 * global_count / static_cast<double>(niter);
         std::cout << "Pi = " << Pi << std::endl;
+        std::cout << "M_PI: " << M_PI << std::endl;
+        std::cout << "Difference from M_PI: " << std::abs(Pi - M_PI) << std::endl;
     }
 
     MPI_Finalize();
+
+    //End the time measurement
+    const auto tend{std::chrono::high_resolution_clock::now()};
+
+    //Duration
+    auto tduration = std::chrono::duration_cast<std::chrono::milliseconds>(tend-tstart).count();
+    std::cout << "Time taken = " << tduration << "ms" << std::endl;
+
     return EXIT_SUCCESS;
 }

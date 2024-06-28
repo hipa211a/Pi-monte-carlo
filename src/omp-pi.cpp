@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <random>
 #include <cmath>
+#include <chrono>
 #include <omp.h>
 
 //Function to generate random numbers between m and n
@@ -19,6 +20,9 @@ int main() {
     int count = 0;
     omp_set_num_threads(4);
     
+    //Start time measurement
+    const auto tstart{std::chrono::high_resolution_clock::now()};
+
     #pragma omp parallel
     {
         #pragma omp single
@@ -41,11 +45,20 @@ int main() {
         count += local_count;
     }
 
+    //End the time measurement
+    const auto tend{std::chrono::high_resolution_clock::now()};
+
     //Calculate value of Pi
     auto Pi = 4.0 * (count/static_cast<double>(niter));
     
     //Print the value
     std::cout << "Pi = " << Pi << std::endl;
+    std::cout << "M_PI: " << M_PI << std::endl;
+    std::cout << "Difference from M_PI: " << std::abs(Pi - M_PI) << std::endl;
+    
+    //Duration
+    auto tduration = std::chrono::duration_cast<std::chrono::milliseconds>(tend-tstart).count();
+    std::cout << "Time taken = " << tduration << "ms" << std::endl;
 
     return 0;
 }
