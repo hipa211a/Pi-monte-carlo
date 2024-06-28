@@ -12,36 +12,39 @@ NVCCFLAGS = -std=c++14 -O2
 SRCDIR = src
 BINDIR = bin
 
-# Explicit targets
-TARGETS = $(BINDIR)/serial-pi $(BINDIR)/omp-pi $(BINDIR)/mpi-pi $(BINDIR)/MPI+OMP-hybrid $(BINDIR)/cuda-pi
+# Targets
+PROGRAMS =  serial-pi omp-pi mpi-pi MPI+OMP-hybrid cuda-pi
+TARGETS = $(addprefix $(BINDIR)/, $(PROGRAMS))
 
 # Default target
-all: $(BINDIR) $(TARGETS)
+all: $(TARGETS)
 
 # Create bin directory if it doesn't exist
 $(BINDIR):
 	mkdir -p $(BINDIR)
 
-$(BINDIR)/serial-pi: $(SRCDIR)/serial-pi.cpp
-	$(CXX) $(CXXFLAGS) -o $(BINDIR)/serial-pi $(SRCDIR)/serial-pi.cpp
+# Generic rules for each program
+$(PROGRAMS): %: $(BINDIR)/%
+	@echo "Compiled $@"
 
-$(BINDIR)/omp-pi: $(SRCDIR)/omp-pi.cpp
-	$(CXX) $(CXXFLAGS) -o $(BINDIR)/omp-pi $(SRCDIR)/omp-pi.cpp
+# Explicit compilation rules
+$(BINDIR)/serial-pi: $(SRCDIR)/serial-pi.cpp | $(BINDIR)
+	$(CXX) $(CXXFLAGS) $< -o $@
 
-$(BINDIR)/pi-thread: $(SRCDIR)/pi-thread.cpp
-	$(CXX) $(CXXFLAGS) -o $(BINDIR)/pi-thread $(SRCDIR)/pi-thread.cpp
+$(BINDIR)/omp-pi: $(SRCDIR)/omp-pi.cpp | $(BINDIR)
+	$(CXX) $(CXXFLAGS) $< -o $@
 
-$(BINDIR)/mpi-pi: $(SRCDIR)/mpi-pi.cpp
-	$(MPICXX) $(MPICXXFLAGS) -o $(BINDIR)/mpi-pi $(SRCDIR)/mpi-pi.cpp
+$(BINDIR)/cuda-pi: $(SRCDIR)/cuda-pi.cu | $(BINDIR)
+	$(NVCC) $(NVCCFLAGS) $< -o $@
 
-$(BINDIR)/MPI+OMP-hybrid: $(SRCDIR)/MPI+OMP-hybrid.cpp
-	$(MPICXX) $(MPICXXFLAGS) -o $(BINDIR)/MPI+OMP-hybrid $(SRCDIR)/MPI+OMP-hybrid.cpp
+$(BINDIR)/mpi-pi: $(SRCDIR)/mpi-pi.cpp | $(BINDIR)
+	$(MPICXX) $(MPICXXFLAGS) $< -o $@
 
-$(BINDIR)/cuda-pi: $(SRCDIR)/cuda-pi.cu
-	$(NVCC) $(NVCCFLAGS) -o $(BINDIR)/cuda-pi $(SRCDIR)/cuda-pi.cu
+$(BINDIR)/MPI+OMP-hybrid: $(SRCDIR)/MPI+OMP-hybrid.cpp | $(BINDIR)
+	$(MPICXX) $(MPICXXFLAGS) $< -o $@
 
+# Clean target
 clean:
 	rm -rf $(BINDIR)
 
-# Phony targets
-.PHONY: all clean
+.PHONY: all clean $(PROGRAMS)
