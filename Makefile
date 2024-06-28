@@ -4,7 +4,7 @@ MPICXX = mpic++
 NVCC = nvcc
 
 # Compiler flags
-CXXFLAGS = -std=c++20 -fopenmp -O2
+CXXFLAGS = -std=c++20 -fopenmp -pthread -O2
 MPICXXFLAGS = -std=c++17 -fopenmp -O2
 NVCCFLAGS = -std=c++14 -O2
 
@@ -13,7 +13,7 @@ SRCDIR = src
 BINDIR = bin
 
 # Targets
-PROGRAMS =  serial-pi omp-pi mpi-pi MPI+OMP-hybrid cuda-pi
+PROGRAMS =  serial-pi omp-pi pi-thread mpi-pi MPI+OMP-hybrid cuda-pi
 TARGETS = $(addprefix $(BINDIR)/, $(PROGRAMS))
 
 # Default target
@@ -29,6 +29,9 @@ $(PROGRAMS): %: $(BINDIR)/%
 
 # Explicit compilation rules
 $(BINDIR)/serial-pi: $(SRCDIR)/serial-pi.cpp | $(BINDIR)
+	$(CXX) $(CXXFLAGS) $< -o $@
+
+$(BINDIR)/pi-thread: $(SRCDIR)/pi-thread.cpp | $(BINDIR)
 	$(CXX) $(CXXFLAGS) $< -o $@
 
 $(BINDIR)/omp-pi: $(SRCDIR)/omp-pi.cpp | $(BINDIR)
